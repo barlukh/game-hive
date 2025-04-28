@@ -1,2 +1,3 @@
-# game-hive
-Game under construction
+## Defenders of the Hive
+
+(under construction)

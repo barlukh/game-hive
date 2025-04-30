@@ -6,14 +6,14 @@ int main(void)
 
     const int screenWidth = 2560;
     const int screenHeight = 1440;
-    const char *screenTitle = "Defenders of the Hive!";
+    const char *screenTitle = "Guardians of the Hive!";
 
     InitWindow(screenWidth, screenHeight, screenTitle);
     // SetWindowState(FLAG_FULLSCREEN_MODE);
 
     SetTargetFPS(60);
 
-    float beeSpeed = 4.0f;
+    float beeSpeed = 8.0f;
 
     int currentFrame = 0;
     float frameTime = 0.2f;
@@ -45,6 +45,11 @@ int main(void)
         if (IsKeyDown(KEY_RIGHT))
             beePos.x += beeSpeed;
 
+		if (beePos.x < 0) beePos.x = 0;
+		if (beePos.x + bee[0].width > screenWidth) beePos.x = screenWidth - bee[0].width;
+		if (beePos.y < 0) beePos.y = 0;
+		if (beePos.y + bee[0].height > screenHeight) beePos.y = screenHeight - bee[0].height;
+	
         beeRect.x = beePos.x;
         beeRect.y = beePos.y;
 
@@ -58,8 +63,13 @@ int main(void)
             ClearBackground(WHITE);
             
             DrawTexture(background, 0, 0, WHITE);
-            DrawTexture(hive, (int)hivePos.x, (int)hivePos.y, WHITE);
-            DrawTexture(bee[currentFrame], (int)beePos.x, (int)beePos.y, WHITE);
+            DrawTextureV(hive, hivePos, WHITE);
+			DrawTextureEx(bee[(currentFrame + 1) % 4], (Vector2){hivePos.x + 30, hivePos.y + 150}, 0, 0.60, WHITE);
+			DrawTextureEx(bee[(currentFrame + 2) % 4], (Vector2){hivePos.x + 450, hivePos.y + 80}, 0, 0.75, WHITE);
+			DrawTextureEx(bee[(currentFrame + 3) % 4], (Vector2){hivePos.x + 270, hivePos.y + 380}, 0, 0.50, WHITE);
+			DrawTextureEx(bee[(currentFrame + 3) % 4], (Vector2){hivePos.x + 270, hivePos.y + 20}, 0, 0.50, WHITE);
+			DrawTextureEx(bee[currentFrame], (Vector2){hivePos.x + 210, hivePos.y + 320}, 0, 0.75, WHITE);
+            DrawTextureV(bee[currentFrame], beePos, WHITE);
 
         EndDrawing();
     }

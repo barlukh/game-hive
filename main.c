@@ -12,8 +12,8 @@ int main(void)
     // SetWindowState(FLAG_FULLSCREEN_MODE);
 
     SetTargetFPS(60);
-    
-	float beeSpeed = 4.0f;
+
+    float beeSpeed = 4.0f;
 
     int currentFrame = 0;
     float frameTime = 0.2f;
@@ -27,22 +27,28 @@ int main(void)
         LoadTexture("graphics/bee3.png"),
         LoadTexture("graphics/bee4.png")
     };
-    
-    Rectangle hiveRect = {80, 464, (float)hive.width, (float)hive.height}; 
-    Rectangle beeRect = {1000, 600, (float)bee[0].width, (float)bee[0].height}; 
+
+    Vector2 hivePos = {80.0f, 464.0f};
+    Vector2 beePos = {1000.0f, 600.0f};
+
+    Rectangle hiveRect = {hivePos.x, hivePos.y, (float)hive.width, (float)hive.height};
+    Rectangle beeRect = {beePos.x, beePos.y, (float)bee[0].width, (float)bee[0].height};
 
     while (!WindowShouldClose())
     {
         if (IsKeyDown(KEY_UP))
-			beeRect.y -= beeSpeed;
-		if (IsKeyDown(KEY_DOWN))
-			beeRect.y += beeSpeed;
-		if (IsKeyDown(KEY_LEFT))
-			beeRect.x -= beeSpeed;
-		if (IsKeyDown(KEY_RIGHT))
-			beeRect.x += beeSpeed;
-		
-		timeElapsed += GetFrameTime();
+            beePos.y -= beeSpeed;
+        if (IsKeyDown(KEY_DOWN))
+            beePos.y += beeSpeed;
+        if (IsKeyDown(KEY_LEFT))
+            beePos.x -= beeSpeed;
+        if (IsKeyDown(KEY_RIGHT))
+            beePos.x += beeSpeed;
+
+        beeRect.x = beePos.x;
+        beeRect.y = beePos.y;
+
+        timeElapsed += GetFrameTime();
         if (timeElapsed >= frameTime) {
             currentFrame = (currentFrame + 1) % 4;
             timeElapsed = 0.0f;
@@ -52,12 +58,12 @@ int main(void)
             ClearBackground(WHITE);
             
             DrawTexture(background, 0, 0, WHITE);
-            DrawTexture(hive, (int)hiveRect.x, (int)hiveRect.y, WHITE);
-            DrawTexture(bee[currentFrame], (int)beeRect.x, (int)beeRect.y, WHITE);
+            DrawTexture(hive, (int)hivePos.x, (int)hivePos.y, WHITE);
+            DrawTexture(bee[currentFrame], (int)beePos.x, (int)beePos.y, WHITE);
 
         EndDrawing();
     }
-    
+
     UnloadTexture(background);
     UnloadTexture(hive);
     for (int i = 0; i < 4; i++) {
@@ -65,5 +71,5 @@ int main(void)
     }
     CloseWindow();
 
-    return (0);
+    return 0;
 }

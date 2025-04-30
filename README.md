@@ -1,3 +1,3 @@
-## Defenders of the Hive
+## Guardians of the Hive
 
 (under construction)

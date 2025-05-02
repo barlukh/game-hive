@@ -34,6 +34,6 @@ typedef struct FrameConfig {
 //----------------------------------------------------------------------------------
 // Function Prototypes
 //----------------------------------------------------------------------------------
-void gamestate_intro(GameState *currentState, Texture2D backgroundIntro);
+void intro(GameState *currentState, Texture2D backgroundIntro);
 
 #endif

@@ -8,7 +8,7 @@ int main(void)
 	GameState currentState = INTRO;
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, GAME_TITLE);
 	SetTargetFPS(SCREEN_FPS);
-	// SetWindowState(FLAG_FULLSCREEN_MODE);
+	SetWindowState(FLAG_FULLSCREEN_MODE);
 
 	// Animation and frame settings
 	FrameConfig time = { 0, 0.2f, 0.0f };
@@ -48,9 +48,9 @@ int main(void)
 
 				// Boundary checks
 				if (beePos.x < 0) beePos.x = 0;
-				if (beePos.x + bee[0].width > SCREEN_WIDTH) beePos.x = SCREEN_HEIGHT - bee[0].width;
+				if (beePos.x + bee[0].width > SCREEN_WIDTH) beePos.x = SCREEN_WIDTH - bee[0].width;
 				if (beePos.y < 0) beePos.y = 0;
-				if (beePos.y + bee[0].height > SCREEN_WIDTH) beePos.y = SCREEN_HEIGHT - bee[0].height;
+				if (beePos.y + bee[0].height > SCREEN_HEIGHT) beePos.y = SCREEN_HEIGHT - bee[0].height;
 
 				// Update bee animation
 				time.elapsed += GetFrameTime();

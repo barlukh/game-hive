@@ -1,110 +1,106 @@
-#include <raylib.h>
-
-typedef enum GameScreen { INTRO = 0, GAMEPLAY } GameScreen;
+#include "hive.h"
 
 int main(void)
 {
-    SetTraceLogLevel(LOG_NONE);
+	SetTraceLogLevel(LOG_NONE);
 
-    const int screenWidth = 2560;
-    const int screenHeight = 1440;
-    const char *screenTitle = "Guardians of the Hive!";
+	// Initial screen and game configuration
+	ScreenConfig screen = { 2560, 1440, 60 };
+	GameState currentState = INTRO;
+	InitWindow(screen.width, screen.height, "Guardians of the Hive!");
+	SetTargetFPS(screen.fps);
+	SetWindowState(FLAG_FULLSCREEN_MODE);
 
-    InitWindow(screenWidth, screenHeight, screenTitle);
+	// Animation and frame settings
+	FrameConfig frame = { 0, 0.2f, 0.0f };
+	float beeSpeed = 10.0f;
 
-    GameScreen currentScreen = INTRO;
-
-    SetTargetFPS(60);
-
-    float beeSpeed = 8.0f;
-
-    int currentFrame = 0;
-    float frameTime = 0.2f;
-    float timeElapsed = 0.0f;
-
+	// Initial textures, vectors, and rectangles
 	Texture2D intro = LoadTexture("graphics/intro.png");
-    Texture2D background = LoadTexture("graphics/background.png");
-    Texture2D hive = LoadTexture("graphics/hive.png");
-    Texture2D bee[4] = {
-        LoadTexture("graphics/bee1.png"),
-        LoadTexture("graphics/bee2.png"),
-        LoadTexture("graphics/bee3.png"),
-        LoadTexture("graphics/bee4.png")
-    };
+	Texture2D background = LoadTexture("graphics/background.png");
+	Texture2D hive = LoadTexture("graphics/hive.png");
+	Texture2D bee[4] = {
+		LoadTexture("graphics/bee1.png"),
+		LoadTexture("graphics/bee2.png"),
+		LoadTexture("graphics/bee3.png"),
+		LoadTexture("graphics/bee4.png")
+	};
 
-    Vector2 hivePos = { 80.0f, 464.0f };
-    Vector2 beePos = { 1000.0f, 600.0f };
+	Vector2 hivePos = { 80.0f, 464.0f };
+	Vector2 beePos = { 1000.0f, 600.0f };
 
-    Rectangle hiveRect = { hivePos.x, hivePos.y, (float)hive.width, (float)hive.height };
-    Rectangle beeRect = { beePos.x, beePos.y, (float)bee[0].width, (float)bee[0].height };
+	Rectangle hiveRect = { hivePos.x, hivePos.y, (float)hive.width, (float)hive.height };
+	Rectangle beeRect = { beePos.x, beePos.y, (float)bee[0].width, (float)bee[0].height };
 
-    while (!WindowShouldClose())
-    {
-        switch (currentScreen)
-        {
-            case INTRO:
-            {
-                BeginDrawing();
-                    ClearBackground(WHITE);
+	while (!WindowShouldClose())
+	{
+		switch (currentState)
+		{
+			case INTRO:
+			{
+				BeginDrawing();
+					ClearBackground(WHITE);
 					DrawTexture(intro, 0, 0, WHITE);
-                    DrawText("Press ENTER to start!", screenWidth / 2 - 240, 1300, 40, PINK); // make it centered
-                EndDrawing();
+					DrawText("Press ENTER to start!", screen.width / 2 - 240, 1300, 40, ORANGE); // make it centered!
+				EndDrawing();
 
-                if (IsKeyPressed(KEY_ENTER))
-                    currentScreen = GAMEPLAY;
-            } break;
+				if (IsKeyPressed(KEY_ENTER))
+					currentState = GAMEPLAY;
+			} break;
 
-            case GAMEPLAY:
-            {
-                // Movement controls
-                if (IsKeyDown(KEY_UP)) beePos.y -= beeSpeed;
-                if (IsKeyDown(KEY_DOWN)) beePos.y += beeSpeed;
-                if (IsKeyDown(KEY_LEFT)) beePos.x -= beeSpeed;
-                if (IsKeyDown(KEY_RIGHT)) beePos.x += beeSpeed;
+			case GAMEPLAY:
+			{
+				// Movement controls
+				if (IsKeyDown(KEY_UP)) beePos.y -= beeSpeed;
+				if (IsKeyDown(KEY_DOWN)) beePos.y += beeSpeed;
+				if (IsKeyDown(KEY_LEFT)) beePos.x -= beeSpeed;
+				if (IsKeyDown(KEY_RIGHT)) beePos.x += beeSpeed;
 
-                // Boundary checks
-                if (beePos.x < 0) beePos.x = 0;
-                if (beePos.x + bee[0].width > screenWidth) beePos.x = screenWidth - bee[0].width;
-                if (beePos.y < 0) beePos.y = 0;
-                if (beePos.y + bee[0].height > screenHeight) beePos.y = screenHeight - bee[0].height;
+				// Boundary checks
+				if (beePos.x < 0) beePos.x = 0;
+				if (beePos.x + bee[0].width > screen.width) beePos.x = screen.height - bee[0].width;
+				if (beePos.y < 0) beePos.y = 0;
+				if (beePos.y + bee[0].height > screen.width) beePos.y = screen.height - bee[0].height;
 
-                // Update bee animation
-                timeElapsed += GetFrameTime();
-                if (timeElapsed >= frameTime) {
-                    currentFrame = (currentFrame + 1) % 4;
-                    timeElapsed = 0.0f;
-                }
+				// Update bee animation
+				frame.elapsed += GetFrameTime();
+				if (frame.elapsed >= frame.threshold) {
+					frame.current = (frame.current + 1) % 4;
+					frame.elapsed = 0.0f;
+				}
 
-                // Update bee rectangle
-                beeRect.x = beePos.x;
-                beeRect.y = beePos.y;
+				// Update bee rectangle
+				beeRect.x = beePos.x;
+				beeRect.y = beePos.y;
 
-                BeginDrawing();
-                    ClearBackground(WHITE);
+				BeginDrawing();
+					ClearBackground(WHITE);
 
-                    // Draw the game elements
-                    DrawTexture(background, 0, 0, WHITE);
-                    DrawTextureV(hive, hivePos, WHITE);
-                    DrawTextureEx(bee[(currentFrame + 1) % 4], (Vector2){ hivePos.x + 30, hivePos.y + 150 }, 0, 0.60, WHITE);
-                    DrawTextureEx(bee[(currentFrame + 2) % 4], (Vector2){ hivePos.x + 450, hivePos.y + 80 }, 0, 0.75, WHITE);
-                    DrawTextureEx(bee[(currentFrame + 3) % 4], (Vector2){ hivePos.x + 270, hivePos.y + 380 }, 0, 0.50, WHITE);
-                    DrawTextureEx(bee[(currentFrame + 3) % 4], (Vector2){ hivePos.x + 270, hivePos.y + 20 }, 0, 0.50, WHITE);
-                    DrawTextureEx(bee[currentFrame], (Vector2){ hivePos.x + 210, hivePos.y + 320 }, 0, 0.75, WHITE);
-                    DrawTextureV(bee[currentFrame], beePos, WHITE);
-                EndDrawing();
-            } break;
+					// Draw the game elements
+					DrawTexture(background, 0, 0, WHITE);
+					DrawTextureV(hive, hivePos, WHITE);
+					DrawTextureEx(bee[(frame.current + 1) % 4], (Vector2){ hivePos.x + 30, hivePos.y + 150 }, 0, 0.60, WHITE);
+					DrawTextureEx(bee[(frame.current + 2) % 4], (Vector2){ hivePos.x + 450, hivePos.y + 80 }, 0, 0.75, WHITE);
+					DrawTextureEx(bee[(frame.current + 3) % 4], (Vector2){ hivePos.x + 270, hivePos.y + 380 }, 0, 0.50, WHITE);
+					DrawTextureEx(bee[(frame.current + 3) % 4], (Vector2){ hivePos.x + 270, hivePos.y + 20 }, 0, 0.50, WHITE);
+					DrawTextureEx(bee[frame.current], (Vector2){ hivePos.x + 210, hivePos.y + 320 }, 0, 0.75, WHITE);
+					DrawTextureV(bee[frame.current], beePos, WHITE);
+				
+				EndDrawing();
+			} break;
 			default: break;
-        }
-    }
+		}
+	}
 
-    // Clean up resources after exiting the game loop
-    UnloadTexture(background);
-    UnloadTexture(hive);
-    for (int i = 0; i < 4; i++) {
-        UnloadTexture(bee[i]);
-    }
+	// Clean up resources after exiting the game loop
+	UnloadTexture(intro);
+	UnloadTexture(background);
+	UnloadTexture(hive);
+	for (int i = 0; i < 4; i++) {
+		UnloadTexture(bee[i]);
+	}
 
-    CloseWindow();
+	CloseWindow();
 
-    return 0;
+	return 0;
 }
